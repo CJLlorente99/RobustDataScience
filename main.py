@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 import numpy.random
 from matplotlib import pyplot as plt
@@ -57,6 +59,7 @@ def dummyUniform(a_parameter, b_parameter, size):
 
 
 if __name__ == '__main__':
+    figNum = 0
 
     # First experiment, explaining the effect of outliers
     errors = np.zeros(201)
@@ -67,7 +70,8 @@ if __name__ == '__main__':
         errors = np.add(errors, dummy(1, 2, 100, -100, 100)['errors'])
     errors /= N
 
-    plt.figure(1)
+    plt.figure(figNum)
+    figNum += 1
     plt.title("Error of the mean with outliers")
     plt.plot(outliers, errors)
 
@@ -79,28 +83,53 @@ if __name__ == '__main__':
 
     errors = np.reshape(errors, (N, 2))
 
-    plt.figure(2)
+    plt.figure(figNum)
+    figNum += 1
     plt.title("Mean evolution")
     plt.plot(errors[:, 0])
 
-    plt.figure(3)
+    plt.figure(figNum)
+    figNum += 1
     plt.title("Var evolution")
     plt.plot(errors[:, 1])
+
+    # Behavior as a normal distribution of the estimator
+    errors = []
+    N = 2000
+    for i in range(1, N + 1):
+        errors = np.append(errors, dummy(1, 2, 500)['errors'])
+
+    errors = np.reshape(errors, (N, 2))
+
+    fisherInfo = 500/2**2
+    varEstimator = math.sqrt(1/fisherInfo)
+    x = np.arange(-1, 1, 0.01)
+    gaussianValuesEstimator = norm.pdf(x, loc=0, scale=varEstimator)
+    print(gaussianValuesEstimator)
+
+    plt.figure(figNum)
+    figNum += 1
+    plt.title("Normal distribution of the estimator")
+    plt.plot(x, gaussianValuesEstimator)
+    plt.hist(errors[:, 0], density=True, bins=30)
 
     # Third experiment, explaining what happens when wrong assumption of distribution is made
     distributions = []
     N = 2000
     distributions = dummyUniform(-10, 10, N)
 
-    plt.figure(4)
+    plt.figure(figNum)
+    figNum += 1
     plt.title("Real histogram distribution")
     plt.hist(distributions['vectorUniformReal'], bins="auto")
 
-    plt.figure(5)
+    plt.figure(figNum)
+    figNum += 1
     plt.title("Gaussian estimated distribution")
     plt.plot(distributions['xGaussian'], distributions['vectorGaussian'], 'b.')
 
-    plt.figure(6)
+    plt.figure(figNum)
+    figNum += 1
     plt.title("Real distribution")
     plt.plot(distributions['xUniform'], distributions['vectorUniform'], 'b.')
 
